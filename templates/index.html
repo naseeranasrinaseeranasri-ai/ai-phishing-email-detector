@@ -1,37 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Phishing Email Detector</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-  <main>
-    <h1>Phishing Email Detector</h1>
-    <p><a href="{{ url_for('main.history') }}">View scan history</a></p>
-    <p id="ollama-status" class="status">Checking Ollama...</p>
-    <p class="note">Use synthetic or authorized emails only. Results are advisory.</p>
+{% extends "base.html" %}
 
-    <form id="analyze-form" method="post" action="{{ url_for('main.analyze') }}">
-      <label for="sender">Sender</label>
-      <input type="text" id="sender" name="sender" maxlength="254"
-             value="{{ values.get('sender', '') }}">
-      {% if errors.get('sender') %}<p class="error">{{ errors['sender'] }}</p>{% endif %}
+{% block content %}
+  <h1>Is this email a trap?</h1>
+  <p class="lead">Paste a suspicious message below and get a risk score with the evidence. Use synthetic or authorized emails only.</p>
 
-      <label for="subject">Subject</label>
-      <input type="text" id="subject" name="subject" maxlength="200"
-             value="{{ values.get('subject', '') }}">
-      {% if errors.get('subject') %}<p class="error">{{ errors['subject'] }}</p>{% endif %}
+  <p id="ollama-status" class="status">Checking Ollama...</p>
 
-      <label for="body">Email body</label>
-      <textarea id="body" name="body" rows="10">{{ values.get('body', '') }}</textarea>
-      {% if errors.get('body') %}<p class="error">{{ errors['body'] }}</p>{% endif %}
+  <form id="analyze-form" method="post" action="{{ url_for('main.analyze') }}">
+    <label for="sender">Sender</label>
+    <input type="text" id="sender" name="sender" maxlength="254"
+           placeholder="Support Team &lt;help@example.com&gt;"
+           value="{{ values.get('sender', '') }}">
+    {% if errors.get('sender') %}<p class="error">{{ errors['sender'] }}</p>{% endif %}
 
-      <button id="analyze-btn" type="submit">Analyze email</button>
-      <p id="loading" class="note" hidden>The local AI is analyzing the email. This can take up to a minute...</p>
-    </form>
-  </main>
-  <script src="{{ url_for('static', filename='app.js') }}"></script>
-</body>
-</html>
+    <label for="subject">Subject</label>
+    <input type="text" id="subject" name="subject" maxlength="200"
+           value="{{ values.get('subject', '') }}">
+    {% if errors.get('subject') %}<p class="error">{{ errors['subject'] }}</p>{% endif %}
+
+    <label for="body">Email body</label>
+    <textarea id="body" name="body" rows="10">{{ values.get('body', '') }}</textarea>
+    {% if errors.get('body') %}<p class="error">{{ errors['body'] }}</p>{% endif %}
+
+    <button id="analyze-btn" type="submit">Check this email</button>
+    <p id="loading" class="note" hidden>The local AI is reading the email. This can take up to a minute...</p>
+  </form>
+{% endblock %}

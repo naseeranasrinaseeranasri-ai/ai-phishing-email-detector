@@ -1,53 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Scan {{ scan.id }}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-  <main>
-    <p><a href="{{ url_for('main.history') }}">&larr; Back to history</a></p>
-    <h1>Scan #{{ scan.id }}</h1>
-    <p class="note">This result is advisory only.</p>
-        <p>
-      Download report:
-      <a href="{{ url_for('main.export_scan', scan_id=scan.id, fmt='json') }}">JSON</a> |
-      <a href="{{ url_for('main.export_scan', scan_id=scan.id, fmt='txt') }}">Text</a>
-    </p>
+{% extends "base.html" %}
 
-    <h2>Risk score: <span class="badge {{ scan.category|lower }}">{{ scan.score }} / 100 ({{ scan.category }})</span></h2>
-    <p>{{ scan.findings.get('explanation', '') }}</p>
-    <p><strong>Time (UTC):</strong> {{ scan.created_at }}</p>
-    <p><strong>Sender:</strong> {{ scan.sender }}</p>
-    <p><strong>Subject:</strong> {{ scan.subject }}</p>
+{% block title %}Scan {{ scan.id }}{% endblock %}
 
-    <h2>Rule indicators ({{ scan.findings.get('rule_points', 0) }} / 60)</h2>
-    {% for ind in scan.findings.get('indicators', []) %}
-      <div>
-        <h3>{{ ind.name }} (+{{ ind.points }})</h3>
-        <p>{{ ind.explanation }}</p>
-        <ul>{% for e in ind.evidence %}<li>{{ e }}</li>{% endfor %}</ul>
-      </div>
-    {% else %}
-      <p>No rule-based indicators found.</p>
-    {% endfor %}
+{% block content %}
+  <p><a href="{{ url_for('main.history') }}">&larr; Back to history</a></p>
+  <h1>Scan #{{ scan.id }}</h1>
+  <p class="note">This result is advisory only.</p>
+  <p class="actions">
+    Download report:
+    <a href="{{ url_for('main.export_scan', scan_id=scan.id, fmt='json') }}">JSON</a> |
+    <a href="{{ url_for('main.export_scan', scan_id=scan.id, fmt='txt') }}">Text</a>
+  </p>
 
-    <h2>AI assessment ({{ scan.findings.get('ai_points', 0) }} / 40)</h2>
-    {% set ai = scan.findings.get('ai') %}
-    {% if ai %}
-      <p><strong>Verdict:</strong> {{ ai.verdict }}
-         | <strong>Confidence:</strong> {{ (ai.confidence * 100)|round|int }}%</p>
-      <h3>Reasons</h3>
-      <ul>{% for r in ai.reasons %}<li>{{ r }}</li>{% endfor %}</ul>
-      <h3>Evidence</h3>
-      <ul>{% for e in ai.evidence %}<li>{{ e }}</li>{% endfor %}</ul>
-      <h3>Recommended next steps</h3>
-      <ul>{% for n in ai.next_steps %}<li>{{ n }}</li>{% endfor %}</ul>
-    {% else %}
-      <p class="error">AI analysis was unavailable: {{ scan.findings.get('ai_error', '') }}</p>
-    {% endif %}
-  </main>
-</body>
-</html>
+  <section class="verdict-row">
+    <div class="sticker {{ scan.category|lower }}" aria-hidden="true">
+      <span class="st-score">{{ scan.score }}</span>
+      <span class="st-cat">{{ scan.category }}</span>
+      <span class="st-label">out of 100</span>
+    </div>
+    <div>
+      <p class="verdict">Risk score: <span class="badge {{ scan.category|lower }}">{{ scan.score }} / 100 ({{ scan.category }})</span></p>
+      <p>{{ scan.findings.get('explanation', '') }}</p>
+    </div>
+  </section>
+
+  <dl class="meta">
+    <dt>Time (UTC)</dt><dd>{{ scan.created_at }}</dd>
+    <dt>Sender</dt><dd>{{ scan.sender }}</dd>
+    <dt>Subject</dt><dd>{{ scan.subject }}</dd>
+  </dl>
+
+  <h2>Rule indicators ({{ scan.findings.get('rule_points', 0) }} / 60)</h2>
+  {% for ind in scan.findings.get('indicators', []) %}
+    <div class="finding">
+      <h3>{{ ind.name }} (+{{ ind.points }})</h3>
+      <p>{{ ind.explanation }}</p>
+      <ul class="evidence">{% for e in ind.evidence %}<li><mark>{{ e }}</mark></li>{% endfor %}</ul>
+    </div>
+  {% else %}
+    <p>No rule-based indicators found.</p>
+  {% endfor %}
+
+  <h2>AI assessment ({{ scan.findings.get('ai_points', 0) }} / 40)</h2>
+  {% set ai = scan.findings.get('ai') %}
+  {% if ai %}
+    <p><strong>Verdict:</strong> {{ ai.verdict }}
+       | <strong>Confidence:</strong> {{ (ai.confidence * 100)|round|int }}%</p>
+    <h3>Reasons</h3>
+    <ul>{% for r in ai.reasons %}<li>{{ r }}</li>{% endfor %}</ul>
+    <h3>Evidence</h3>
+    <ul class="evidence">{% for e in ai.evidence %}<li><mark>{{ e }}</mark></li>{% endfor %}</ul>
+    <h3>Recommended next steps</h3>
+    <ul>{% for n in ai.next_steps %}<li>{{ n }}</li>{% endfor %}</ul>
+  {% else %}
+    <p class="error">AI analysis was unavailable: {{ scan.findings.get('ai_error', '') }}</p>
+  {% endif %}
+{% endblock %}

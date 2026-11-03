@@ -1,20 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Scan history</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-  <main>
-    <p><a href="{{ url_for('main.index') }}">&larr; New analysis</a></p>
-    <h1>Scan history</h1>
+{% extends "base.html" %}
 
-    <form method="get" action="{{ url_for('main.history') }}" class="filters">
+{% block title %}Scan history{% endblock %}
+
+{% block content %}
+  <h1>Scan history</h1>
+
+  <form method="get" action="{{ url_for('main.history') }}" class="filters">
+    <div>
       <label for="q">Search sender or subject</label>
       <input type="text" id="q" name="q" value="{{ search }}">
-
+    </div>
+    <div>
       <label for="category">Category</label>
       <select id="category" name="category">
         <option value="">All</option>
@@ -22,12 +18,14 @@
           <option value="{{ c }}" {% if c == category %}selected{% endif %}>{{ c }}</option>
         {% endfor %}
       </select>
-      <button type="submit">Filter</button>
-    </form>
+    </div>
+    <button type="submit">Filter</button>
+  </form>
 
-    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
 
-    {% if scans %}
+  {% if scans %}
+    <div class="table-wrap">
       <table>
         <thead>
           <tr><th>Time (UTC)</th><th>Sender</th><th>Subject</th><th>Score</th><th>Category</th><th></th></tr>
@@ -39,8 +37,8 @@
             <td>{{ s.sender }}</td>
             <td>{{ s.subject }}</td>
             <td>{{ s.score }}</td>
-            <td>{{ s.category }}</td>
-            <td>
+            <td><span class="pill {{ s.category|lower }}">{{ s.category }}</span></td>
+            <td class="row-actions">
               <a href="{{ url_for('main.scan_detail', scan_id=s.id) }}">View</a>
               <form method="post" action="{{ url_for('main.delete_scan', scan_id=s.id) }}"
                     class="inline" data-confirm="Delete this scan?">
@@ -51,15 +49,13 @@
           {% endfor %}
         </tbody>
       </table>
+    </div>
 
-      <form method="post" action="{{ url_for('main.clear_history') }}"
-            data-confirm="Delete ALL scan history? This cannot be undone.">
-        <button type="submit" class="danger">Clear all history</button>
-      </form>
-    {% else %}
-      <p>No scans found. Analyze an email and it will appear here.</p>
-    {% endif %}
-  </main>
-  <script src="{{ url_for('static', filename='app.js') }}"></script>
-</body>
-</html>
+    <form method="post" action="{{ url_for('main.clear_history') }}"
+          data-confirm="Delete ALL scan history? This cannot be undone.">
+      <button type="submit" class="danger">Clear all history</button>
+    </form>
+  {% else %}
+    <p class="empty">No scans yet. Check an email and it will show up here.</p>
+  {% endif %}
+{% endblock %}

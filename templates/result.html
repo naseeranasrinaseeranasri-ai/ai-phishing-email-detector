@@ -1,65 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Result</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-  <main>
-    <h1>Analysis result</h1>
-    <p class="note">This result is advisory only. It is not a guarantee that an email is safe or malicious.</p>
+{% extends "base.html" %}
 
-       <h2>Risk score: <span class="badge {{ final.category|lower }}">{{ final.score }} / 100 ({{ final.category }})</span></h2>
-    <p>{{ final.explanation }}</p>
+{% block title %}Result{% endblock %}
 
-    <p><strong>Sender:</strong> {{ data.sender }}</p>
-    <p><strong>Subject:</strong> {{ data.subject }}</p>
+{% block content %}
+  <h1>Here is what we found</h1>
+  <p class="note">This result is advisory only. It is not a guarantee that an email is safe or malicious.</p>
 
-    <h2>Rule indicators ({{ final.rule_points }} / 60)</h2>
-    {% if rules.indicators %}
-      {% for ind in rules.indicators %}
-        <div>
-          <h3>{{ ind.name }} (+{{ ind.points }})</h3>
-          <p>{{ ind.explanation }}</p>
-          <ul>
-            {% for e in ind.evidence %}<li>{{ e }}</li>{% endfor %}
-          </ul>
-        </div>
-      {% endfor %}
-    {% else %}
-      <p>No rule-based indicators found.</p>
-    {% endif %}
+  <section class="verdict-row">
+    <div class="sticker {{ final.category|lower }}" aria-hidden="true">
+      <span class="st-score">{{ final.score }}</span>
+      <span class="st-cat">{{ final.category }}</span>
+      <span class="st-label">out of 100</span>
+    </div>
+    <div>
+      <p class="verdict">Risk score: <span class="badge {{ final.category|lower }}">{{ final.score }} / 100 ({{ final.category }})</span></p>
+      <p>{{ final.explanation }}</p>
+    </div>
+  </section>
 
-    <h2>AI assessment ({{ final.ai_points }} / 40)</h2>
-    {% if final.ai_available %}
-      <p><strong>Verdict:</strong> {{ final.ai.verdict }}
-         | <strong>Confidence:</strong> {{ (final.ai.confidence * 100)|round|int }}%</p>
-      <h3>Reasons</h3>
-      <ul>{% for r in final.ai.reasons %}<li>{{ r }}</li>{% endfor %}</ul>
-      <h3>Evidence</h3>
-      <ul>{% for e in final.ai.evidence %}<li>{{ e }}</li>{% endfor %}</ul>
-      <h3>Recommended next steps</h3>
-      <ul>{% for n in final.ai.next_steps %}<li>{{ n }}</li>{% endfor %}</ul>
-    {% else %}
-      <p class="error">AI analysis unavailable: {{ final.ai_error }}</p>
-    {% endif %}
+  <dl class="meta">
+    <dt>Sender</dt><dd>{{ data.sender }}</dd>
+    <dt>Subject</dt><dd>{{ data.subject }}</dd>
+  </dl>
 
-    {% if scan_id %}
-    <p>
-      Download report:
-      <a href="{{ url_for('main.export_scan', scan_id=scan_id, fmt='json') }}">JSON</a> |
-      <a href="{{ url_for('main.export_scan', scan_id=scan_id, fmt='txt') }}">Text</a>
-    </p>
-    {% endif %}
+  <h2>Rule indicators ({{ final.rule_points }} / 60)</h2>
+  {% if rules.indicators %}
+    {% for ind in rules.indicators %}
+      <div class="finding">
+        <h3>{{ ind.name }} (+{{ ind.points }})</h3>
+        <p>{{ ind.explanation }}</p>
+        <ul class="evidence">
+          {% for e in ind.evidence %}<li><mark>{{ e }}</mark></li>{% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No rule-based indicators found.</p>
+  {% endif %}
 
-    {% if save_error %}<p class="error">{{ save_error }}</p>{% endif %}
+  <h2>AI assessment ({{ final.ai_points }} / 40)</h2>
+  {% if final.ai_available %}
+    <p><strong>Verdict:</strong> {{ final.ai.verdict }}
+       | <strong>Confidence:</strong> {{ (final.ai.confidence * 100)|round|int }}%</p>
+    <h3>Reasons</h3>
+    <ul>{% for r in final.ai.reasons %}<li>{{ r }}</li>{% endfor %}</ul>
+    <h3>Evidence</h3>
+    <ul class="evidence">{% for e in final.ai.evidence %}<li><mark>{{ e }}</mark></li>{% endfor %}</ul>
+    <h3>Recommended next steps</h3>
+    <ul>{% for n in final.ai.next_steps %}<li>{{ n }}</li>{% endfor %}</ul>
+  {% else %}
+    <p class="error">AI analysis unavailable: {{ final.ai_error }}</p>
+  {% endif %}
 
-    <p>
-      <a href="{{ url_for('main.index') }}">Analyze another email</a> |
-      <a href="{{ url_for('main.history') }}">View history</a>
-    </p>
-  </main>
-</body>
-</html>
+  {% if scan_id %}
+  <p class="actions">
+    Download report:
+    <a href="{{ url_for('main.export_scan', scan_id=scan_id, fmt='json') }}">JSON</a> |
+    <a href="{{ url_for('main.export_scan', scan_id=scan_id, fmt='txt') }}">Text</a>
+  </p>
+  {% endif %}
+
+  {% if save_error %}<p class="error">{{ save_error }}</p>{% endif %}
+
+  <p class="actions">
+    <a href="{{ url_for('main.index') }}">Check another email</a> |
+    <a href="{{ url_for('main.history') }}">View history</a>
+  </p>
+{% endblock %}
