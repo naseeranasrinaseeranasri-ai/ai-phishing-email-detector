@@ -47,6 +47,11 @@
     {% endif %}
 
     <p><a href="{{ url_for('main.index') }}">Analyze another email</a></p>
+        {% if save_error %}<p class="error">{{ save_error }}</p>{% endif %}
+    <p>
+      <a href="{{ url_for('main.index') }}">Analyze another email</a> |
+      <a href="{{ url_for('main.history') }}">View history</a>
+    </p>
   </main>
 </body>
 </html>

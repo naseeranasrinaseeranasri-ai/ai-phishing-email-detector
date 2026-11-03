@@ -11,6 +11,9 @@ def create_app():
         static_folder="../static",
     )
 
+    from .database import init_db
+    init_db()
+
     from .routes import main
     app.register_blueprint(main)
 

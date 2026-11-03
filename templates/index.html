@@ -9,6 +9,7 @@
 <body>
   <main>
     <h1>Phishing Email Detector</h1>
+        <p><a href="{{ url_for('main.history') }}">View scan history</a></p>
     <p class="note">Use synthetic or authorized emails only. Results are advisory.</p>
 
     <form method="post" action="{{ url_for('main.analyze') }}">

@@ -1,8 +1,12 @@
-from flask import Blueprint, render_template, request
-from .validation import validate_email_input
-from .rules import analyze_rules
+import sqlite3
+
+from flask import Blueprint, abort, redirect, render_template, request, url_for
+
+from . import database
 from .ollama_client import analyze_with_ai
+from .rules import analyze_rules
 from .scoring import combine
+from .validation import validate_email_input
 
 main = Blueprint("main", __name__)
 
@@ -26,4 +30,48 @@ def analyze():
     rules = analyze_rules(cleaned["sender"], cleaned["subject"], cleaned["body"])
     ai_response = analyze_with_ai(cleaned["sender"], cleaned["subject"], cleaned["body"])
     final = combine(rules, ai_response)
-    return render_template("result.html", data=cleaned, rules=rules, final=final)
+
+    # A database problem must not hide the analysis from the user
+    scan_id, save_error = None, None
+    try:
+        scan_id = database.save_scan(cleaned["sender"], cleaned["subject"], final, rules)
+    except sqlite3.Error:
+        save_error = "The scan could not be saved to history."
+
+    return render_template("result.html", data=cleaned, rules=rules, final=final,
+                           scan_id=scan_id, save_error=save_error)
+
+
+@main.route("/history")
+def history():
+    search = request.args.get("q", "").strip()[:100]
+    category = request.args.get("category", "").strip()
+    if category not in {"Low", "Medium", "High", "Critical"}:
+        category = ""
+    try:
+        scans = database.list_scans(search, category)
+        error = None
+    except sqlite3.Error:
+        scans, error = [], "History could not be loaded."
+    return render_template("history.html", scans=scans, search=search,
+                           category=category, error=error)
+
+
+@main.route("/history/<int:scan_id>")
+def scan_detail(scan_id):
+    scan = database.get_scan(scan_id)
+    if scan is None:
+        abort(404)
+    return render_template("detail.html", scan=scan)
+
+
+@main.route("/history/<int:scan_id>/delete", methods=["POST"])
+def delete_scan(scan_id):
+    database.delete_scan(scan_id)
+    return redirect(url_for("main.history"))
+
+
+@main.route("/history/clear", methods=["POST"])
+def clear_history():
+    database.clear_scans()
+    return redirect(url_for("main.history"))

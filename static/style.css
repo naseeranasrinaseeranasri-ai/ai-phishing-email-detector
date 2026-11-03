@@ -9,3 +9,11 @@ button:hover { background: #1e40af; }
 .error { color: #b91c1c; margin: 0.3rem 0 0; }
 .note { color: #444; }
 pre { white-space: pre-wrap; background: #fff; padding: 1rem; border-radius: 6px; border: 1px solid #ccc; }
+table { width: 100%; border-collapse: collapse; background: #fff; margin: 1rem 0; }
+th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #ddd; vertical-align: top; word-break: break-word; }
+.filters { margin-bottom: 1rem; }
+select { padding: 0.5rem; font: inherit; }
+form.inline { display: inline; }
+button.danger { background: #b91c1c; }
+button.danger:hover { background: #991b1b; }
+button.small { margin-top: 0; padding: 0.2rem 0.6rem; font-size: 0.85rem; }
