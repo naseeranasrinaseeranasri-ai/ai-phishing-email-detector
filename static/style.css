@@ -17,3 +17,14 @@ form.inline { display: inline; }
 button.danger { background: #b91c1c; }
 button.danger:hover { background: #991b1b; }
 button.small { margin-top: 0; padding: 0.2rem 0.6rem; font-size: 0.85rem; }
+.status { padding: 0.5rem 0.8rem; border-radius: 6px; font-size: 0.9rem; border: 1px solid #888; background: #fff; }
+.status.ok { border-color: #15803d; background: #dcfce7; color: #14532d; }
+.status.bad { border-color: #b91c1c; background: #fee2e2; color: #7f1d1d; }
+
+.badge { display: inline-block; padding: 0.2rem 0.8rem; border-radius: 6px; color: #fff; }
+.badge.low { background: #15803d; }
+.badge.medium { background: #a16207; }
+.badge.high { background: #c2410c; }
+.badge.critical { background: #991b1b; }
+
+button:disabled { background: #6b7280; cursor: wait; }

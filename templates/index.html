@@ -9,10 +9,11 @@
 <body>
   <main>
     <h1>Phishing Email Detector</h1>
-        <p><a href="{{ url_for('main.history') }}">View scan history</a></p>
+    <p><a href="{{ url_for('main.history') }}">View scan history</a></p>
+    <p id="ollama-status" class="status">Checking Ollama...</p>
     <p class="note">Use synthetic or authorized emails only. Results are advisory.</p>
 
-    <form method="post" action="{{ url_for('main.analyze') }}">
+    <form id="analyze-form" method="post" action="{{ url_for('main.analyze') }}">
       <label for="sender">Sender</label>
       <input type="text" id="sender" name="sender" maxlength="254"
              value="{{ values.get('sender', '') }}">
@@ -27,8 +28,10 @@
       <textarea id="body" name="body" rows="10">{{ values.get('body', '') }}</textarea>
       {% if errors.get('body') %}<p class="error">{{ errors['body'] }}</p>{% endif %}
 
-      <button type="submit">Analyze email</button>
+      <button id="analyze-btn" type="submit">Analyze email</button>
+      <p id="loading" class="note" hidden>The local AI is analyzing the email. This can take up to a minute...</p>
     </form>
   </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

@@ -1,9 +1,10 @@
 import sqlite3
 
-from flask import Blueprint, abort, redirect, render_template, request, url_for
+from flask import Blueprint, Response, abort, jsonify, redirect, render_template, request, url_for
 
 from . import database
-from .ollama_client import analyze_with_ai
+from .ollama_client import analyze_with_ai, check_status
+from .reports import build_json_report, build_text_report
 from .rules import analyze_rules
 from .scoring import combine
 from .validation import validate_email_input
@@ -14,6 +15,10 @@ main = Blueprint("main", __name__)
 @main.route("/")
 def index():
     return render_template("index.html", values={}, errors={})
+
+@main.route("/status")
+def status():
+    return jsonify(check_status())
 
 
 @main.route("/analyze", methods=["POST"])
@@ -63,6 +68,24 @@ def scan_detail(scan_id):
     if scan is None:
         abort(404)
     return render_template("detail.html", scan=scan)
+
+
+@main.route("/history/<int:scan_id>/export/<fmt>")
+def export_scan(scan_id, fmt):
+    if fmt not in ("json", "txt"):
+        abort(404)
+    scan = database.get_scan(scan_id)
+    if scan is None:
+        abort(404)
+    if fmt == "json":
+        body, mimetype = build_json_report(scan), "application/json"
+    else:
+        body, mimetype = build_text_report(scan), "text/plain"
+    return Response(
+        body,
+        mimetype=mimetype,
+        headers={"Content-Disposition": f"attachment; filename=scan-{scan_id}.{fmt}"},
+    )
 
 
 @main.route("/history/<int:scan_id>/delete", methods=["POST"])

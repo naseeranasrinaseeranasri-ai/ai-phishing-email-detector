@@ -11,8 +11,13 @@
     <p><a href="{{ url_for('main.history') }}">&larr; Back to history</a></p>
     <h1>Scan #{{ scan.id }}</h1>
     <p class="note">This result is advisory only.</p>
+        <p>
+      Download report:
+      <a href="{{ url_for('main.export_scan', scan_id=scan.id, fmt='json') }}">JSON</a> |
+      <a href="{{ url_for('main.export_scan', scan_id=scan.id, fmt='txt') }}">Text</a>
+    </p>
 
-    <h2>Risk score: {{ scan.score }} / 100 ({{ scan.category }})</h2>
+    <h2>Risk score: <span class="badge {{ scan.category|lower }}">{{ scan.score }} / 100 ({{ scan.category }})</span></h2>
     <p>{{ scan.findings.get('explanation', '') }}</p>
     <p><strong>Time (UTC):</strong> {{ scan.created_at }}</p>
     <p><strong>Sender:</strong> {{ scan.sender }}</p>

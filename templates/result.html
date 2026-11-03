@@ -11,7 +11,7 @@
     <h1>Analysis result</h1>
     <p class="note">This result is advisory only. It is not a guarantee that an email is safe or malicious.</p>
 
-    <h2>Risk score: {{ final.score }} / 100 ({{ final.category }})</h2>
+       <h2>Risk score: <span class="badge {{ final.category|lower }}">{{ final.score }} / 100 ({{ final.category }})</span></h2>
     <p>{{ final.explanation }}</p>
 
     <p><strong>Sender:</strong> {{ data.sender }}</p>
@@ -46,8 +46,16 @@
       <p class="error">AI analysis unavailable: {{ final.ai_error }}</p>
     {% endif %}
 
-    <p><a href="{{ url_for('main.index') }}">Analyze another email</a></p>
-        {% if save_error %}<p class="error">{{ save_error }}</p>{% endif %}
+    {% if scan_id %}
+    <p>
+      Download report:
+      <a href="{{ url_for('main.export_scan', scan_id=scan_id, fmt='json') }}">JSON</a> |
+      <a href="{{ url_for('main.export_scan', scan_id=scan_id, fmt='txt') }}">Text</a>
+    </p>
+    {% endif %}
+
+    {% if save_error %}<p class="error">{{ save_error }}</p>{% endif %}
+
     <p>
       <a href="{{ url_for('main.index') }}">Analyze another email</a> |
       <a href="{{ url_for('main.history') }}">View history</a>
