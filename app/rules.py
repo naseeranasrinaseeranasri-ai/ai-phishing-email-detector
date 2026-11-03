@@ -125,4 +125,30 @@ def check_sender_mismatch(sender):
     """Display name claims a brand, but the email domain is not that brand's."""
     display_name, address = parseaddr(sender)
     if not display_name or "@" not in address:
-        return None  # not
+        return None  # not enough data, so no signal
+    domain = address.rsplit("@", 1)[1].lower()
+    for brand, real_domains in BRAND_DOMAINS.items():
+        if brand in display_name.lower():
+            ok = any(domain == d or domain.endswith("." + d) for d in real_domains)
+            if not ok:
+                return Indicator(
+                    "Sender mismatch", 15,
+                    "The display name claims a brand, but the email domain does not belong to it.",
+                    [f'Display name "{display_name}" but domain is "{domain}"'])
+    return None
+
+
+def analyze_rules(sender, subject, body):
+    """Run every check once and combine the results."""
+    text = f"{subject}\n{body}"
+    checks = [
+        check_urgency(text),
+        check_threats(text),
+        check_credentials(text),
+        check_payment(text),
+        check_urls(text),
+        check_sender_mismatch(sender),
+    ]
+    indicators = [c for c in checks if c is not None]
+    raw = sum(i.points for i in indicators)
+    return RuleResult(score=min(raw, MAX_RULE_SCORE), raw_score=raw, indicators=indicators)
