@@ -28,5 +28,17 @@ function setupLoading() {
   });
 }
 
+// Ask for confirmation before forms that have a data-confirm attribute
+function setupConfirm() {
+  document.querySelectorAll("form[data-confirm]").forEach(function (form) {
+    form.addEventListener("submit", function (event) {
+      if (!window.confirm(form.dataset.confirm)) {
+        event.preventDefault();
+      }
+    });
+  });
+}
+
 loadStatus();
 setupLoading();
+setupConfirm();

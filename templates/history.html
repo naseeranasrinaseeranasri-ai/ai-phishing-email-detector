@@ -43,7 +43,7 @@
             <td>
               <a href="{{ url_for('main.scan_detail', scan_id=s.id) }}">View</a>
               <form method="post" action="{{ url_for('main.delete_scan', scan_id=s.id) }}"
-                    class="inline" onsubmit="return confirm('Delete this scan?');">
+                    class="inline" data-confirm="Delete this scan?">
                 <button type="submit" class="danger small">Delete</button>
               </form>
             </td>
@@ -53,12 +53,13 @@
       </table>
 
       <form method="post" action="{{ url_for('main.clear_history') }}"
-            onsubmit="return confirm('Delete ALL scan history? This cannot be undone.');">
+            data-confirm="Delete ALL scan history? This cannot be undone.">
         <button type="submit" class="danger">Clear all history</button>
       </form>
     {% else %}
       <p>No scans found. Analyze an email and it will appear here.</p>
     {% endif %}
   </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

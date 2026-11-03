@@ -9,6 +9,10 @@ from .rules import analyze_rules
 from .scoring import combine
 from .validation import validate_email_input
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 main = Blueprint("main", __name__)
 
 
@@ -40,7 +44,10 @@ def analyze():
     scan_id, save_error = None, None
     try:
         scan_id = database.save_scan(cleaned["sender"], cleaned["subject"], final, rules)
-    except sqlite3.Error:
+        logger.info("Scan saved: id=%s score=%s category=%s ai_available=%s",
+                    scan_id, final["score"], final["category"], final["ai_available"])
+    except sqlite3.Error as exc:
+        logger.error("Could not save scan: %s", type(exc).__name__)
         save_error = "The scan could not be saved to history."
 
     return render_template("result.html", data=cleaned, rules=rules, final=final,

@@ -103,3 +103,13 @@ def test_normal_email_scores_zero():
     )
     assert result.score == 0
     assert result.indicators == []
+def test_otp_inside_another_word_is_not_flagged():
+    assert check_credentials("I love hotpot") is None
+
+
+def test_standalone_otp_is_flagged():
+    assert check_credentials("Please send me the OTP now") is not None
+
+
+def test_partial_word_does_not_match_urgency():
+    assert check_urgency("The urgently needed repair is done") is None

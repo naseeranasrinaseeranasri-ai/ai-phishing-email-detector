@@ -60,8 +60,12 @@ class RuleResult:
 
 
 def _matches(text, phrases):
-    """Return the phrases found in text (text must be lowercase)."""
-    return [p for p in phrases if p in text]
+    """Return the phrases found in text as whole words (text must be lowercase)."""
+    found = []
+    for phrase in phrases:
+        if re.search(r"\b" + re.escape(phrase) + r"\b", text):
+            found.append(phrase)
+    return found
 
 
 def check_urgency(text):
