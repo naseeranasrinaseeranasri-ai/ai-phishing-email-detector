@@ -13,6 +13,22 @@
     <p><strong>Subject:</strong> {{ data.subject }}</p>
     <p><strong>Body:</strong></p>
     <pre>{{ data.body }}</pre>
+
+    <h2>Rule score: {{ rules.score }} / 60</h2>
+    {% if rules.indicators %}
+      {% for ind in rules.indicators %}
+        <div>
+          <h3>{{ ind.name }} (+{{ ind.points }})</h3>
+          <p>{{ ind.explanation }}</p>
+          <ul>
+            {% for e in ind.evidence %}<li>{{ e }}</li>{% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No rule-based indicators found.</p>
+    {% endif %}
+
     <p><a href="{{ url_for('main.index') }}">Analyze another email</a></p>
   </main>
 </body>
