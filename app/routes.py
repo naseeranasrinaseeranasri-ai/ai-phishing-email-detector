@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request
 from .validation import validate_email_input
 from .rules import analyze_rules
+from .ollama_client import analyze_with_ai
+from .scoring import combine
 
 main = Blueprint("main", __name__)
 
@@ -19,8 +21,9 @@ def analyze():
     )
 
     if errors:
-        # Show the form again with error messages and what the user typed
         return render_template("index.html", values=cleaned, errors=errors), 400
 
     rules = analyze_rules(cleaned["sender"], cleaned["subject"], cleaned["body"])
-    return render_template("result.html", data=cleaned, rules=rules)
+    ai_response = analyze_with_ai(cleaned["sender"], cleaned["subject"], cleaned["body"])
+    final = combine(rules, ai_response)
+    return render_template("result.html", data=cleaned, rules=rules, final=final)

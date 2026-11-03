@@ -8,13 +8,16 @@
 </head>
 <body>
   <main>
-    <h1>Input received</h1>
+    <h1>Analysis result</h1>
+    <p class="note">This result is advisory only. It is not a guarantee that an email is safe or malicious.</p>
+
+    <h2>Risk score: {{ final.score }} / 100 ({{ final.category }})</h2>
+    <p>{{ final.explanation }}</p>
+
     <p><strong>Sender:</strong> {{ data.sender }}</p>
     <p><strong>Subject:</strong> {{ data.subject }}</p>
-    <p><strong>Body:</strong></p>
-    <pre>{{ data.body }}</pre>
 
-    <h2>Rule score: {{ rules.score }} / 60</h2>
+    <h2>Rule indicators ({{ final.rule_points }} / 60)</h2>
     {% if rules.indicators %}
       {% for ind in rules.indicators %}
         <div>
@@ -27,6 +30,20 @@
       {% endfor %}
     {% else %}
       <p>No rule-based indicators found.</p>
+    {% endif %}
+
+    <h2>AI assessment ({{ final.ai_points }} / 40)</h2>
+    {% if final.ai_available %}
+      <p><strong>Verdict:</strong> {{ final.ai.verdict }}
+         | <strong>Confidence:</strong> {{ (final.ai.confidence * 100)|round|int }}%</p>
+      <h3>Reasons</h3>
+      <ul>{% for r in final.ai.reasons %}<li>{{ r }}</li>{% endfor %}</ul>
+      <h3>Evidence</h3>
+      <ul>{% for e in final.ai.evidence %}<li>{{ e }}</li>{% endfor %}</ul>
+      <h3>Recommended next steps</h3>
+      <ul>{% for n in final.ai.next_steps %}<li>{{ n }}</li>{% endfor %}</ul>
+    {% else %}
+      <p class="error">AI analysis unavailable: {{ final.ai_error }}</p>
     {% endif %}
 
     <p><a href="{{ url_for('main.index') }}">Analyze another email</a></p>
