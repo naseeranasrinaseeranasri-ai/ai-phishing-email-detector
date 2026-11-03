@@ -1,0 +1,11 @@
+body { font-family: system-ui, sans-serif; background: #f4f6f8; color: #1a1a1a; margin: 0; }
+main { max-width: 700px; margin: 2rem auto; padding: 0 1rem; }
+label { display: block; margin-top: 1rem; font-weight: 600; }
+input, textarea { width: 100%; padding: 0.6rem; margin-top: 0.3rem;
+                  border: 1px solid #888; border-radius: 6px; font: inherit; box-sizing: border-box; }
+button { margin-top: 1rem; padding: 0.7rem 1.4rem; background: #1d4ed8; color: #fff;
+         border: 0; border-radius: 6px; font: inherit; cursor: pointer; }
+button:hover { background: #1e40af; }
+.error { color: #b91c1c; margin: 0.3rem 0 0; }
+.note { color: #444; }
+pre { white-space: pre-wrap; background: #fff; padding: 1rem; border-radius: 6px; border: 1px solid #ccc; }

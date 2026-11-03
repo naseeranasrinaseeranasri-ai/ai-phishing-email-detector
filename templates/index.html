@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phishing Email Detector</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main>
+    <h1>Phishing Email Detector</h1>
+    <p class="note">Use synthetic or authorized emails only. Results are advisory.</p>
+
+    <form method="post" action="{{ url_for('main.analyze') }}">
+      <label for="sender">Sender</label>
+      <input type="text" id="sender" name="sender" maxlength="254"
+             value="{{ values.get('sender', '') }}">
+      {% if errors.get('sender') %}<p class="error">{{ errors['sender'] }}</p>{% endif %}
+
+      <label for="subject">Subject</label>
+      <input type="text" id="subject" name="subject" maxlength="200"
+             value="{{ values.get('subject', '') }}">
+      {% if errors.get('subject') %}<p class="error">{{ errors['subject'] }}</p>{% endif %}
+
+      <label for="body">Email body</label>
+      <textarea id="body" name="body" rows="10">{{ values.get('body', '') }}</textarea>
+      {% if errors.get('body') %}<p class="error">{{ errors['body'] }}</p>{% endif %}
+
+      <button type="submit">Analyze email</button>
+    </form>
+  </main>
+</body>
+</html>

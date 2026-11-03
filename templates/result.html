@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Result</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main>
+    <h1>Input received</h1>
+    <p><strong>Sender:</strong> {{ data.sender }}</p>
+    <p><strong>Subject:</strong> {{ data.subject }}</p>
+    <p><strong>Body:</strong></p>
+    <pre>{{ data.body }}</pre>
+    <p><a href="{{ url_for('main.index') }}">Analyze another email</a></p>
+  </main>
+</body>
+</html>
